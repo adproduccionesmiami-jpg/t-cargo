@@ -1,0 +1,38 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    body {
+        background-color: #e2e8f0;
+        color: #1a1a1b;
+        font-family: 'Inter', sans-serif;
+        -webkit-font-smoothing: antialiased;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+        color: #0f172a;
+        font-weight: 900;
+    }
+}
+
+.card-crextio {
+    @apply bg-white rounded-[2.5rem] shadow-sm border border-black/5 p-6;
+}
+
+.card-dark {
+    @apply bg-[#0f172a] rounded-[2.5rem] shadow-2xl p-8 text-white relative overflow-hidden;
+}
+
+.btn-crextio {
+    @apply bg-[#f59e0b] text-white font-black py-4 px-8 rounded-full transition-all hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-[#f59e0b]/30 flex items-center justify-center gap-2;
+}
+
+.btn-secondary-crextio {
+    @apply bg-white text-black font-bold py-4 px-8 rounded-full border border-gray-100 shadow-sm transition-all active:scale-95 flex items-center justify-center gap-2;
+}
