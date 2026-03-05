@@ -21,6 +21,8 @@ export function NewTripForm({ onSuccess, onCancel }: NewTripFormProps) {
     const [tripDate, setTripDate] = useState(new Date().toISOString().split('T')[0])
     const [mileageStart, setMileageStart] = useState('')
     const [mileageEnd, setMileageEnd] = useState('')
+    const [origin, setOrigin] = useState('HABANA')
+    const [destination, setDestination] = useState('MATANZAS')
     const [isPlateSelectorOpen, setIsPlateSelectorOpen] = useState(false)
     const selectorRef = useRef<HTMLDivElement>(null)
 
@@ -63,6 +65,8 @@ export function NewTripForm({ onSuccess, onCancel }: NewTripFormProps) {
                 amount_currency: currency,
                 amount_value: parseFloat(amount),
                 status: 'En curso', // Default status
+                origin,
+                destination,
                 mileage_start: mileageStart ? parseFloat(mileageStart) : undefined,
                 mileage_end: mileageEnd ? parseFloat(mileageEnd) : undefined
             })
@@ -144,19 +148,31 @@ export function NewTripForm({ onSuccess, onCancel }: NewTripFormProps) {
 
             {/* Origen & Destino */}
             <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2 opacity-50">
+                <div className="space-y-2">
                     <label className="text-xs font-black text-[#0f172a] uppercase tracking-widest pl-1">Origen</label>
                     <div className="relative group">
-                        <div className="w-full bg-[#f8fafc] border border-transparent rounded-[1.5rem] py-4 px-6 flex justify-between items-center transition-all shadow-sm cursor-not-allowed">
-                            <span className="text-sm font-black text-[#0f172a] truncate">HABANA</span>
+                        <div className="w-full bg-[#f8fafc] border border-transparent rounded-[1.5rem] py-4 px-6 flex justify-between items-center group-focus-within:bg-white group-focus-within:border-gray-200 transition-all shadow-sm">
+                            <input
+                                type="text"
+                                value={origin}
+                                onChange={(e) => setOrigin(e.target.value.toUpperCase())}
+                                className="bg-transparent border-none focus:ring-0 p-0 text-sm font-black text-[#0f172a] w-full"
+                                placeholder="ORIGEN"
+                            />
                         </div>
                     </div>
                 </div>
-                <div className="space-y-2 opacity-50">
+                <div className="space-y-2">
                     <label className="text-xs font-black text-[#0f172a] uppercase tracking-widest pl-1">Destino</label>
                     <div className="relative group">
-                        <div className="w-full bg-[#f8fafc] border border-transparent rounded-[1.5rem] py-4 px-6 flex justify-between items-center transition-all shadow-sm cursor-not-allowed">
-                            <span className="text-sm font-black text-[#0f172a] truncate">MATANZAS</span>
+                        <div className="w-full bg-[#f8fafc] border border-transparent rounded-[1.5rem] py-4 px-6 flex justify-between items-center group-focus-within:bg-white group-focus-within:border-gray-200 transition-all shadow-sm">
+                            <input
+                                type="text"
+                                value={destination}
+                                onChange={(e) => setDestination(e.target.value.toUpperCase())}
+                                className="bg-transparent border-none focus:ring-0 p-0 text-sm font-black text-[#0f172a] w-full"
+                                placeholder="DESTINO"
+                            />
                         </div>
                     </div>
                 </div>

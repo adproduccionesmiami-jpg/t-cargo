@@ -56,6 +56,8 @@ Descripción: Cabecera del viaje. El FX e ingreso base viven aquí.
 | amount_currency | TEXT | Sí | No | Sí | USD o CUP |
 | amount_value | NUMERIC | Sí | No | Sí | Monto en moneda original |
 | fx_usd_to_cup | NUMERIC | No | No | Sí | Tasa USD→CUP del viaje |
+| origin | TEXT | No | No | Sí | Ciudad de origen |
+| destination | TEXT | No | No | Sí | Ciudad de destino |
 | created_by_user_id | UUID | Sí | No | No | FK → app_users.id |
 
 ### Tabla: trip_expenses
