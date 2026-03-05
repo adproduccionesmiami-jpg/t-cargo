@@ -156,7 +156,7 @@ export function NewTripForm({ onSuccess, onCancel }: NewTripFormProps) {
                         <button
                             type="button"
                             onClick={() => setCurrency('USD')}
-                            className={`px-4 py-2 rounded-full text-[10px] font-black tracking-widest transition-all ${currency === 'USD' ? 'bg-white shadow-sm text-[#0f172a]' : 'text-slate-400'
+                            className={`px-4 py-2 rounded-full text-[10px] font-black tracking-widest transition-all ${currency === 'USD' ? 'bg-[#0f172a] shadow-sm text-white' : 'text-slate-400'
                                 }`}
                         >
                             USD
@@ -164,7 +164,7 @@ export function NewTripForm({ onSuccess, onCancel }: NewTripFormProps) {
                         <button
                             type="button"
                             onClick={() => setCurrency('CUP')}
-                            className={`px-4 py-2 rounded-full text-[10px] font-black tracking-widest transition-all ${currency === 'CUP' ? 'bg-white shadow-sm text-[#0f172a]' : 'text-slate-400'
+                            className={`px-4 py-2 rounded-full text-[10px] font-black tracking-widest transition-all ${currency === 'CUP' ? 'bg-[#0f172a] shadow-sm text-white' : 'text-slate-400'
                                 }`}
                         >
                             CUP
