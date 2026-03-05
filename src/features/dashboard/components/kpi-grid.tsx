@@ -43,7 +43,7 @@ function KPICard({ title, value, subtitle, trend, trendUp, variant = 'white' }: 
                     ${Number(value || 0).toLocaleString('es-ES', { minimumFractionDigits: 0 })}
                 </span>
                 {isDark && (
-                    <span className="text-sm font-black text-[#f59e0b] mb-1">CLP</span>
+                    <span className="text-sm font-black text-[#f59e0b] mb-1">USD</span>
                 )}
             </div>
 

@@ -1,8 +1,9 @@
 'use client'
 
-import { useEffect, useState } from 'react'
-import { Calendar, ChevronDown, Plus, Loader2 } from 'lucide-react'
+import { useEffect, useState, useRef } from 'react'
+import { Calendar, ChevronDown, Plus, Loader2, Truck } from 'lucide-react'
 import { tripService, Vehicle } from '../services/trip-service'
+import { getVehiclesAction } from '../actions/vehicle-actions'
 
 interface NewTripFormProps {
     onSuccess: () => void
@@ -21,15 +22,32 @@ export function NewTripForm({ onSuccess, onCancel }: NewTripFormProps) {
     const [mileageStart, setMileageStart] = useState('')
     const [mileageEnd, setMileageEnd] = useState('')
     const [isPlateSelectorOpen, setIsPlateSelectorOpen] = useState(false)
+    const selectorRef = useRef<HTMLDivElement>(null)
+
+    // Close selector on click outside
+    useEffect(() => {
+        function handleClickOutside(event: MouseEvent) {
+            if (selectorRef.current && !selectorRef.current.contains(event.target as Node)) {
+                setIsPlateSelectorOpen(false)
+            }
+        }
+        document.addEventListener('mousedown', handleClickOutside)
+        return () => document.removeEventListener('mousedown', handleClickOutside)
+    }, [])
 
     useEffect(() => {
         async function loadVehicles() {
-            const data = await tripService.getVehicles()
-            setVehicles(data)
-            if (data.length > 0) {
-                setSelectedPlateId(data[0].id)
+            try {
+                const data = await getVehiclesAction()
+                setVehicles(data)
+                if (data.length > 0) {
+                    setSelectedPlateId(data[0].id)
+                }
+            } catch (error) {
+                console.error('Error in loadVehicles:', error)
+            } finally {
+                setIsLoadingVehicles(false)
             }
-            setIsLoadingVehicles(false)
         }
         loadVehicles()
     }, [])
@@ -63,33 +81,62 @@ export function NewTripForm({ onSuccess, onCancel }: NewTripFormProps) {
         <div className="space-y-6">
             {/* Chapa Input */}
             <div className="space-y-2">
-                <label className="text-xs font-black text-[#0f172a] uppercase tracking-widest pl-1">Chapa</label>
-                <div className="relative group">
+                <label className="text-xs font-black text-[#0f172a] uppercase tracking-widest pl-1">Chapa / Rastra</label>
+                <div className="relative group" ref={selectorRef}>
                     <button
+                        type="button"
                         onClick={() => setIsPlateSelectorOpen(!isPlateSelectorOpen)}
-                        className="w-full bg-[#f8fafc] border border-transparent rounded-[1.5rem] py-4 px-6 flex justify-between items-center group-focus-within:bg-white group-focus-within:border-gray-200 transition-all shadow-sm cursor-pointer"
+                        className={`w-full bg-[#f8fafc] border rounded-[1.5rem] py-4 px-6 flex justify-between items-center transition-all shadow-sm cursor-pointer ${isPlateSelectorOpen ? 'bg-white border-gray-200 ring-4 ring-[#f59e0b]/5' : 'border-transparent'
+                            }`}
                     >
-                        <span className="text-base font-black text-[#0f172a]">
-                            {isLoadingVehicles ? 'Cargando...' : selectedVehicle?.plate || 'Seleccionar'}
-                        </span>
-                        <ChevronDown className={`w-5 h-5 text-slate-400 transition-transform ${isPlateSelectorOpen ? 'rotate-180' : ''}`} />
+                        <div className="flex items-center gap-3">
+                            <div className={`p-2 rounded-xl transition-colors ${selectedVehicle ? 'bg-slate-100 text-[#0f172a]' : 'bg-slate-50 text-slate-400'}`}>
+                                <Truck className="w-4 h-4" />
+                            </div>
+                            <div className="flex flex-col items-start translate-y-[-1px]">
+                                <span className="text-base font-black text-[#0f172a]">
+                                    {isLoadingVehicles ? 'Cargando...' : selectedVehicle?.plate || 'Seleccionar'}
+                                </span>
+                            </div>
+                        </div>
+                        <ChevronDown className={`w-5 h-5 text-slate-400 transition-transform duration-300 ${isPlateSelectorOpen ? 'rotate-180' : ''}`} />
                     </button>
 
                     {isPlateSelectorOpen && (
-                        <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-100 rounded-2xl shadow-xl z-10 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
-                            {vehicles.map(vehicle => (
-                                <button
-                                    key={vehicle.id}
-                                    onClick={() => {
-                                        setSelectedPlateId(vehicle.id)
-                                        setIsPlateSelectorOpen(false)
-                                    }}
-                                    className="w-full px-6 py-4 text-left hover:bg-slate-50 transition-colors border-b border-gray-50 last:border-none flex justify-between items-center"
-                                >
-                                    <span className="font-black text-[#0f172a]">{vehicle.plate}</span>
-                                    {vehicle.alias && <span className="text-xs font-bold text-slate-400 uppercase">{vehicle.alias}</span>}
-                                </button>
-                            ))}
+                        <div className="absolute top-full left-0 right-0 mt-3 bg-white border border-gray-100 rounded-[1.5rem] shadow-2xl z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-300">
+                            <div className="max-height-[240px] overflow-y-auto scrollbar-hide py-2">
+                                {vehicles.length === 0 ? (
+                                    <div className="px-6 py-4 text-center">
+                                        <p className="text-xs font-bold text-slate-400 uppercase">No hay vehículos</p>
+                                    </div>
+                                ) : (
+                                    vehicles.map(vehicle => {
+                                        const isSelected = vehicle.id === selectedPlateId;
+                                        return (
+                                            <button
+                                                key={vehicle.id}
+                                                type="button"
+                                                onClick={() => {
+                                                    setSelectedPlateId(vehicle.id)
+                                                    setIsPlateSelectorOpen(false)
+                                                }}
+                                                className={`w-full px-6 py-4 text-left transition-all flex justify-between items-center group/item ${isSelected ? 'bg-slate-50' : 'hover:bg-slate-50/50'
+                                                    }`}
+                                            >
+                                                <div className="flex flex-col">
+                                                    <span className={`font-black text-sm transition-colors ${isSelected ? 'text-[#f59e0b]' : 'text-[#0f172a]'
+                                                        }`}>
+                                                        {vehicle.plate}
+                                                    </span>
+                                                </div>
+                                                {isSelected && (
+                                                    <div className="w-1.5 h-1.5 rounded-full bg-[#f59e0b]" />
+                                                )}
+                                            </button>
+                                        );
+                                    })
+                                )}
+                            </div>
                         </div>
                     )}
                 </div>

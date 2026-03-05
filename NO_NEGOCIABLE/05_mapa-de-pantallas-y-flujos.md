@@ -26,7 +26,8 @@ T-Cargo no es una colección de pantallas, es un flujo operativo controlado para
 - **Objetivo:** Visión general operativa y financiera.
 - **KPIs (Mobile-first):** Total ingresos, Total gastos, Utilidad neta (USD equiv).
 - **Tabla (Headers MAYÚS):** FECHA, RUTA, CHAPA, ESTADO, INGRESO, GASTO, UTILIDAD.
-- **Acciones:** Nuevo Viaje (CTA Ámbar), Filtros, Ver Detalle.
+- **Acciones:** Nuevo Viaje (Drawer Mobile-First), Filtros, Ver Detalle.
+- **Selector Chapa (Optimizado):** Lista limpia (solo matrículas P170184/P170185), sin alias, con scroll y cierre automático.
 
 ### Pantalla: Detalle de Viaje
 

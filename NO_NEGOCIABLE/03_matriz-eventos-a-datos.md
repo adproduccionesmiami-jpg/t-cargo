@@ -11,7 +11,8 @@ Toda acción visible en pantalla debe afectar una tabla específica, modificar c
 | **Login** | Iniciar sesión | auth.users + app_users | SELECT | Auth válido; is_active=true | Perfil cargado; acceso RLS |
 | **Viajes (Lista)**| Consultar lista | trip_financials (VIEW) | SELECT | RLS de roles | Lista + KPIs coherentes |
 | **Viajes (Lista)**| Filtrar lista | trip_financials (VIEW) | SELECT | Parámetros válidos | Lista filtrada |
-| **Nuevo Viaje** | Guardar viaje | trips + audit_log | INSERT | amount_value > 0; status OK | Viaje creado e indexado |
+| **Nuevo Viaje** | Seleccionar Chapa | vehicles | SELECT | Listar chapas activas | Chapa vinculada al viaje |
+| **Nuevo Viaje** | Guardar viaje | trips + audit_log | INSERT | amount_value >= 0; status OK | Viaje creado e indexado |
 | **Detalle Viaje** | Consultar detalle | trips + financials + expenses | SELECT | RLS | Header + Resumen + Gastos |
 | **Detalle Viaje** | Cambiar estado | trips + audit_log | UPDATE | Transición válida | Estado y auditoría actualizados |
 | **Actualizar FX** | Guardar FX | trips + audit_log | UPDATE | fx_usd_to_cup > 0 | FX y gastos recalculados |
