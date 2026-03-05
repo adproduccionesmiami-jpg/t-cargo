@@ -6,9 +6,10 @@ import { tripService, Vehicle } from '../services/trip-service'
 
 interface NewTripFormProps {
     onSuccess: () => void
+    onCancel?: () => void
 }
 
-export function NewTripForm({ onSuccess }: NewTripFormProps) {
+export function NewTripForm({ onSuccess, onCancel }: NewTripFormProps) {
     const [vehicles, setVehicles] = useState<Vehicle[]>([])
     const [isLoadingVehicles, setIsLoadingVehicles] = useState(true)
     const [isSubmitting, setIsSubmitting] = useState(false)
@@ -17,6 +18,8 @@ export function NewTripForm({ onSuccess }: NewTripFormProps) {
     const [amount, setAmount] = useState('0.00')
     const [selectedPlateId, setSelectedPlateId] = useState('')
     const [tripDate, setTripDate] = useState(new Date().toISOString().split('T')[0])
+    const [mileageStart, setMileageStart] = useState('')
+    const [mileageEnd, setMileageEnd] = useState('')
     const [isPlateSelectorOpen, setIsPlateSelectorOpen] = useState(false)
 
     useEffect(() => {
@@ -41,7 +44,9 @@ export function NewTripForm({ onSuccess }: NewTripFormProps) {
                 plate_id: selectedPlateId,
                 amount_currency: currency,
                 amount_value: parseFloat(amount),
-                status: 'En curso' // Default status
+                status: 'En curso', // Default status
+                mileage_start: mileageStart ? parseFloat(mileageStart) : undefined,
+                mileage_end: mileageEnd ? parseFloat(mileageEnd) : undefined
             })
             onSuccess()
         } catch (error) {
@@ -168,8 +173,40 @@ export function NewTripForm({ onSuccess }: NewTripFormProps) {
                 </div>
             </div>
 
-            {/* Submit Button */}
-            <div className="pt-4">
+            {/* Kilometraje Inputs */}
+            <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                    <label className="text-xs font-black text-[#0f172a] uppercase tracking-widest pl-1">Millaje Encendido</label>
+                    <div className="relative group">
+                        <div className="w-full bg-[#f8fafc] border border-transparent rounded-[1.5rem] py-4 px-6 flex items-center group-focus-within:bg-white group-focus-within:border-gray-200 transition-all shadow-sm">
+                            <input
+                                type="number"
+                                value={mileageStart}
+                                onChange={(e) => setMileageStart(e.target.value)}
+                                className="bg-transparent border-none focus:ring-0 p-0 text-base font-black text-[#0f172a] w-full"
+                                placeholder="0"
+                            />
+                        </div>
+                    </div>
+                </div>
+                <div className="space-y-2">
+                    <label className="text-xs font-black text-[#0f172a] uppercase tracking-widest pl-1">Millaje Apagado</label>
+                    <div className="relative group">
+                        <div className="w-full bg-[#f8fafc] border border-transparent rounded-[1.5rem] py-4 px-6 flex items-center group-focus-within:bg-white group-focus-within:border-gray-200 transition-all shadow-sm">
+                            <input
+                                type="number"
+                                value={mileageEnd}
+                                onChange={(e) => setMileageEnd(e.target.value)}
+                                className="bg-transparent border-none focus:ring-0 p-0 text-base font-black text-[#0f172a] w-full"
+                                placeholder="0"
+                            />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {/* Submit & Cancel Buttons */}
+            <div className="pt-4 flex flex-col gap-3">
                 <button
                     onClick={handleSubmit}
                     disabled={isSubmitting || isLoadingVehicles}
@@ -184,6 +221,16 @@ export function NewTripForm({ onSuccess }: NewTripFormProps) {
                         </>
                     )}
                 </button>
+
+                {onCancel && (
+                    <button
+                        onClick={onCancel}
+                        disabled={isSubmitting}
+                        className="w-full bg-slate-100 text-slate-500 font-black py-4 px-8 rounded-[2rem] transition-all hover:bg-slate-200 active:scale-[0.98] flex items-center justify-center gap-2 text-base disabled:opacity-50"
+                    >
+                        <span>Cancelar</span>
+                    </button>
+                )}
             </div>
 
             {/* Footer Line */}

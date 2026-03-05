@@ -130,10 +130,13 @@ export default function DashboardPage() {
         onClose={() => setIsDrawerOpen(false)}
         title="Nuevo Viaje"
       >
-        <NewTripForm onSuccess={() => {
-          setIsDrawerOpen(false)
-          loadData(filter)
-        }} />
+        <NewTripForm
+          onSuccess={() => {
+            setIsDrawerOpen(false)
+            loadData(filter)
+          }}
+          onCancel={() => setIsDrawerOpen(false)}
+        />
       </Drawer>
     </div>
   )

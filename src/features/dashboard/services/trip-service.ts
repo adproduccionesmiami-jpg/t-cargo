@@ -72,6 +72,8 @@ export const tripService = {
         amount_currency: 'USD' | 'CUP';
         amount_value: number;
         status: string;
+        mileage_start?: number;
+        mileage_end?: number;
     }) {
         const supabase = createClient()
 
