@@ -187,7 +187,7 @@ export default function TripDetailPage({ params }: PageProps) {
                             </div>
                             <div>
                                 <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">FECHA</p>
-                                <p className="text-sm font-black text-gray-900">{new Date(trip.trip_date).toLocaleDateString()}</p>
+                                <p className="text-sm font-black text-gray-900">{new Date(trip.trip_date + 'T00:00:00').toLocaleDateString()}</p>
                             </div>
                         </div>
                         <div className="pl-3 border-l-2 border-dashed border-slate-100 space-y-4">
@@ -223,65 +223,7 @@ export default function TripDetailPage({ params }: PageProps) {
                 </div>
             </section>
 
-            {/* 2. Tasa FX Operativa (Editable Manualmente) */}
-            <section>
-                <div className={`card-crextio !py-5 transition-all border-2 ${isEditingFx ? 'border-[#f59e0b] bg-amber-50/30' : 'border-transparent'}`}>
-                    <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-4">
-                            <div className={`w-11 h-11 rounded-full flex items-center justify-center transition-colors ${isEditingFx ? 'bg-amber-100 text-amber-600' : 'bg-slate-50 text-slate-400'}`}>
-                                <Scale className="w-5 h-5" />
-                            </div>
-                            <div>
-                                <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">TASA CAMBIO (FLUCTUACIÓN)</p>
-                                {isEditingFx ? (
-                                    <div className="flex items-center gap-2 mt-1">
-                                        <span className="text-sm font-black text-gray-900">1 USD =</span>
-                                        <input
-                                            autoFocus
-                                            type="number"
-                                            value={tempFx}
-                                            onChange={(e) => setTempFx(e.target.value)}
-                                            className="w-24 bg-white border-b-2 border-amber-500 text-base font-black text-gray-900 px-1 py-0 outline-none"
-                                        />
-                                        <span className="text-sm font-black text-gray-900">CUP</span>
-                                    </div>
-                                ) : (
-                                    <p className="text-base font-black text-gray-900">1 USD = {trip.fx_usd_to_cup} CUP</p>
-                                )}
-                            </div>
-                        </div>
-
-                        <div className="flex gap-2">
-                            {isEditingFx ? (
-                                <>
-                                    <button
-                                        onClick={() => { setIsEditingFx(false); setTempFx(trip.fx_usd_to_cup.toString()); }}
-                                        className="p-2.5 hover:bg-red-50 text-red-400 rounded-full"
-                                    >
-                                        <X className="w-5 h-5" />
-                                    </button>
-                                    <button
-                                        onClick={handleFxSave}
-                                        disabled={isUpdatingFx}
-                                        className="p-2.5 hover:bg-green-50 text-green-500 rounded-full"
-                                    >
-                                        {isUpdatingFx ? <Loader2 className="w-5 h-5 animate-spin" /> : <Check className="w-5 h-5" />}
-                                    </button>
-                                </>
-                            ) : (
-                                <button
-                                    onClick={() => setIsEditingFx(true)}
-                                    className="p-2.5 hover:bg-amber-50 rounded-full text-[#f59e0b] transition-colors"
-                                >
-                                    <RefreshCcw className="w-5 h-5" />
-                                </button>
-                            )}
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            {/* 3. Combustible y Notas (Manual) */}
+            {/* 2. Combustible y Notas (Manual) - Subido por importancia */}
             <section className="space-y-6">
                 <div className="flex items-center justify-between">
                     <h2 className="text-lg font-black text-gray-900 tracking-tight">Detalles de Operación</h2>
@@ -413,7 +355,97 @@ export default function TripDetailPage({ params }: PageProps) {
                 </div>
             </section>
 
-            {/* 4. Selector de Estado (Premium Buttons) — Antes del cierre final */}
+            {/* 3. Tasa FX Operativa (Bajado para flujo financiero) */}
+            <section>
+                <div className={`card-crextio !py-5 transition-all border-2 ${isEditingFx ? 'border-[#f59e0b] bg-amber-50/30' : 'border-transparent'}`}>
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-4">
+                            <div className={`w-11 h-11 rounded-full flex items-center justify-center transition-colors ${isEditingFx ? 'bg-amber-100 text-amber-600' : 'bg-slate-50 text-slate-400'}`}>
+                                <Scale className="w-5 h-5" />
+                            </div>
+                            <div>
+                                <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">TASA CAMBIO (FLUCTUACIÓN)</p>
+                                {isEditingFx ? (
+                                    <div className="flex items-center gap-2 mt-1">
+                                        <span className="text-sm font-black text-gray-900">1 USD =</span>
+                                        <input
+                                            autoFocus
+                                            type="number"
+                                            value={tempFx}
+                                            onChange={(e) => setTempFx(e.target.value)}
+                                            className="w-24 bg-white border-b-2 border-amber-500 text-base font-black text-gray-900 px-1 py-0 outline-none"
+                                        />
+                                        <span className="text-sm font-black text-gray-900">CUP</span>
+                                    </div>
+                                ) : (
+                                    <p className="text-base font-black text-gray-900">1 USD = {trip.fx_usd_to_cup} CUP</p>
+                                )}
+                            </div>
+                        </div>
+
+                        <div className="flex gap-2">
+                            {isEditingFx ? (
+                                <>
+                                    <button
+                                        onClick={() => { setIsEditingFx(false); setTempFx(trip.fx_usd_to_cup.toString()); }}
+                                        className="p-2.5 hover:bg-red-50 text-red-400 rounded-full"
+                                    >
+                                        <X className="w-5 h-5" />
+                                    </button>
+                                    <button
+                                        onClick={handleFxSave}
+                                        disabled={isUpdatingFx}
+                                        className="p-2.5 hover:bg-green-50 text-green-500 rounded-full"
+                                    >
+                                        {isUpdatingFx ? <Loader2 className="w-5 h-5 animate-spin" /> : <Check className="w-5 h-5" />}
+                                    </button>
+                                </>
+                            ) : (
+                                <button
+                                    onClick={() => setIsEditingFx(true)}
+                                    className="p-2.5 hover:bg-amber-50 rounded-full text-[#f59e0b] transition-colors"
+                                >
+                                    <RefreshCcw className="w-5 h-5" />
+                                </button>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            {/* 4. Resultado Final (La Verdad de los Socios) */}
+            <section>
+                <div className="card-dark relative overflow-hidden ring-8 ring-slate-900/5 shadow-2xl">
+                    <div className="flex justify-between items-start mb-10 relative z-10">
+                        <div>
+                            <p className="text-[11px] font-black text-[#f59e0b] uppercase tracking-[0.3em] mb-2">UTILIDAD NETA TOTAL</p>
+                            <h2 className="text-5xl font-black text-white tracking-tighter">
+                                ${Number(trip.profit_usd_equiv || 0).toLocaleString('es-ES', { minimumFractionDigits: 0 })}
+                            </h2>
+                        </div>
+                        <div className="bg-white/10 p-5 rounded-3xl backdrop-blur-md border border-white/5">
+                            <TrendingUp className="w-8 h-8 text-[#f59e0b]" />
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-10 pt-8 border-t border-white/10 relative z-10">
+                        <div className="group">
+                            <p className="text-[11px] font-black text-gray-500 uppercase tracking-[0.2em] mb-1.5 group-hover:text-amber-500 transition-colors">Socio A (50%)</p>
+                            <p className="text-2xl font-black text-white tracking-tight">${Number(trip.partner_a_share_usd || 0).toLocaleString('es-ES')}</p>
+                        </div>
+                        <div className="group">
+                            <p className="text-[11px] font-black text-gray-500 uppercase tracking-[0.2em] mb-1.5 group-hover:text-amber-500 transition-colors">Socio B (50%)</p>
+                            <p className="text-2xl font-black text-white tracking-tight">${Number(trip.partner_b_share_usd || 0).toLocaleString('es-ES')}</p>
+                        </div>
+                    </div>
+
+                    {/* Efectos visuales de fondo premium */}
+                    <div className="absolute top-0 right-0 w-80 h-80 bg-amber-500/15 rounded-full blur-[100px] -mr-40 -mt-40 pointer-events-none" />
+                    <div className="absolute bottom-0 left-0 w-40 h-40 bg-blue-500/5 rounded-full blur-[60px] -ml-20 -mb-20 pointer-events-none" />
+                </div>
+            </section>
+
+            {/* 5. Selector de Estado (Confirmación Final) */}
             <section className="space-y-4">
                 <label className="text-[11px] font-black text-gray-400 uppercase tracking-widest ml-1">Actualizar Estado Operativo</label>
                 <div className="bg-[#f1f5f9] p-2 rounded-[1.8rem] flex items-center shadow-inner relative overflow-hidden ring-1 ring-slate-200">
@@ -459,38 +491,6 @@ export default function TripDetailPage({ params }: PageProps) {
                         </div>
                     </div>
                 )}
-            </section>
-
-            {/* 5. Resultado Final (La Verdad de los Socios) — Al final de todo */}
-            <section>
-                <div className="card-dark relative overflow-hidden ring-8 ring-slate-900/5 shadow-2xl">
-                    <div className="flex justify-between items-start mb-10 relative z-10">
-                        <div>
-                            <p className="text-[11px] font-black text-[#f59e0b] uppercase tracking-[0.3em] mb-2">UTILIDAD NETA TOTAL</p>
-                            <h2 className="text-5xl font-black text-white tracking-tighter">
-                                ${Number(trip.profit_usd_equiv || 0).toLocaleString('es-ES', { minimumFractionDigits: 0 })}
-                            </h2>
-                        </div>
-                        <div className="bg-white/10 p-5 rounded-3xl backdrop-blur-md border border-white/5">
-                            <TrendingUp className="w-8 h-8 text-[#f59e0b]" />
-                        </div>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-10 pt-8 border-t border-white/10 relative z-10">
-                        <div className="group">
-                            <p className="text-[11px] font-black text-gray-500 uppercase tracking-[0.2em] mb-1.5 group-hover:text-amber-500 transition-colors">Socio A (50%)</p>
-                            <p className="text-2xl font-black text-white tracking-tight">${Number(trip.partner_a_share_usd || 0).toLocaleString('es-ES')}</p>
-                        </div>
-                        <div className="group">
-                            <p className="text-[11px] font-black text-gray-500 uppercase tracking-[0.2em] mb-1.5 group-hover:text-amber-500 transition-colors">Socio B (50%)</p>
-                            <p className="text-2xl font-black text-white tracking-tight">${Number(trip.partner_b_share_usd || 0).toLocaleString('es-ES')}</p>
-                        </div>
-                    </div>
-
-                    {/* Efectos visuales de fondo premium */}
-                    <div className="absolute top-0 right-0 w-80 h-80 bg-amber-500/15 rounded-full blur-[100px] -mr-40 -mt-40 pointer-events-none" />
-                    <div className="absolute bottom-0 left-0 w-40 h-40 bg-blue-500/5 rounded-full blur-[60px] -ml-20 -mb-20 pointer-events-none" />
-                </div>
             </section>
         </div>
     )

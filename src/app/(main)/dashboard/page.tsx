@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { Plus, List } from 'lucide-react'
+import { Plus, List, Search, X, Calendar as CalendarIcon, Filter } from 'lucide-react'
 import { KPIGrid } from '@/features/dashboard/components/kpi-grid'
 import { TripList } from '@/features/dashboard/components/trip-list'
 import { tripService, TripFinancials, DashboardFilter } from '@/features/dashboard/services/trip-service'
@@ -23,6 +23,8 @@ export default function DashboardPage() {
     const f = searchParams.get('filter')
     return (f === 'hoy' || f === 'mes' || f === 'todo') ? f : 'todo'
   })
+  const [searchQuery, setSearchQuery] = useState('')
+  const [showSearch, setShowSearch] = useState(searchParams.get('search') === 'active')
 
   const loadData = async (currentFilter: DashboardFilter) => {
     setIsLoading(true)
@@ -39,7 +41,29 @@ export default function DashboardPage() {
     loadData(filter)
   }, [filter])
 
+  useEffect(() => {
+    const isSearchActive = searchParams.get('search') === 'active'
+    setShowSearch(isSearchActive)
+  }, [searchParams])
+
   const { trips, totals } = data
+
+  const filteredTrips = trips.filter(trip => {
+    const query = searchQuery.toLowerCase()
+    const matchesPlate = trip.plate.toLowerCase().includes(query)
+    const matchesDate = trip.trip_date.toLowerCase().includes(query)
+    const matchesAlias = trip.vehicle_alias?.toLowerCase().includes(query)
+
+    return matchesPlate || matchesDate || matchesAlias
+  })
+
+  // Lógica de visualización: 
+  // 1. Si hay búsqueda: mostrar resultados filtrados.
+  // 2. Si no hay búsqueda y es 'hoy' sin viajes: mostrar los 5 recientes.
+  // 3. De lo contrario: mostrar la lista del filtro actual.
+  const tripsToDisplay = searchQuery
+    ? filteredTrips
+    : (filter === 'hoy' && trips.length === 0 ? recentTrips : trips)
 
   return (
     <div className="p-6 space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
@@ -49,9 +73,37 @@ export default function DashboardPage() {
         </h1>
       </header>
 
-      {/* Filter Selector */}
-      <div className="flex justify-center -mt-2 px-2">
-        <div className="bg-slate-100/50 p-1.5 rounded-full flex items-center shadow-inner border border-slate-100 w-full max-w-sm">
+      {/* Search Bar - Condicional */}
+      {(showSearch || searchQuery) && (
+        <div className="px-2 animate-in slide-in-from-top-4 duration-300">
+          <div className="relative group">
+            <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-[#f2b90d] transition-colors" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Buscar por chapa o fecha (YYYY-MM-DD)..."
+              className="w-full bg-white border-2 border-slate-100 rounded-[1.8rem] pl-14 pr-12 py-5 text-sm font-bold text-gray-900 focus:border-[#f2b90d] outline-none transition-all shadow-sm shadow-slate-200/50"
+            />
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery('')}
+                className="absolute right-5 top-1/2 -translate-y-1/2 w-6 h-6 bg-slate-100 rounded-full flex items-center justify-center text-slate-400 hover:text-red-500 transition-colors"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Filter Selector - Temporalidad */}
+      <div className="flex flex-col gap-4 px-2">
+        <div className="flex items-center gap-2 mb-1 px-4">
+          <Filter className="w-3.5 h-3.5 text-slate-400" />
+          <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Temporalidad</span>
+        </div>
+        <div className="bg-slate-100/50 p-1.5 rounded-full flex items-center shadow-inner border border-slate-100 w-full max-w-sm mx-auto">
           <button
             onClick={() => setFilter('hoy')}
             className={`flex-1 px-2 py-3 rounded-full text-[10px] font-black uppercase tracking-[0.2em] transition-all duration-300 ${filter === 'hoy' ? 'bg-white shadow-md text-slate-900 scale-105' : 'text-slate-400'
@@ -105,7 +157,10 @@ export default function DashboardPage() {
                 Ver Todo
               </button>
             </div>
-            <TripList trips={filter === 'hoy' && trips.length === 0 ? recentTrips : trips} />
+            <TripList
+              trips={tripsToDisplay}
+              isSearchActive={!!searchQuery}
+            />
           </section>
         </>
       )}

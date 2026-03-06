@@ -10,6 +10,7 @@ interface TripCardProps {
 
 interface TripListProps {
     trips: TripFinancials[];
+    isSearchActive?: boolean;
 }
 
 export function TripCard({ trip }: TripCardProps) {
@@ -29,7 +30,7 @@ export function TripCard({ trip }: TripCardProps) {
                         <span className="text-amber-500 uppercase text-[10px] tracking-wider">{trip.status}</span>
                     </h3>
                     <p className="text-[10px] font-bold text-gray-400 mt-0.5 uppercase tracking-widest">
-                        {new Date(trip.trip_date).toLocaleDateString('es-ES', { day: 'numeric', month: 'short' })} • {trip.amount_value.toLocaleString()} {trip.amount_currency}
+                        {new Date(trip.trip_date + 'T00:00:00').toLocaleDateString('es-ES', { day: 'numeric', month: 'short' })} • {trip.amount_value.toLocaleString()} {trip.amount_currency}
                     </p>
                     {trip.status === 'Completado' && trip.km_recorridos != null && (
                         <p className="text-[9px] font-bold text-[#f59e0b] mt-1 uppercase tracking-[0.15em]">
@@ -51,11 +52,13 @@ export function TripCard({ trip }: TripCardProps) {
     )
 }
 
-export function TripList({ trips }: TripListProps) {
+export function TripList({ trips, isSearchActive }: TripListProps) {
     if (trips.length === 0) {
         return (
             <div className="text-center py-12 bg-white/50 rounded-[2.5rem] border-dashed border-2 border-gray-100">
-                <p className="text-gray-400 text-sm font-bold">No hay viajes registrados aún.</p>
+                <p className="text-gray-400 text-sm font-bold">
+                    {isSearchActive ? 'No se encontraron viajes que coincidan con la búsqueda.' : 'No hay viajes registrados aún.'}
+                </p>
             </div>
         )
     }

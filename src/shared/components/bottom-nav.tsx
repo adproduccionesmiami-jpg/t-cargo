@@ -2,13 +2,12 @@
 
 import Link from 'next/link'
 import { usePathname, useSearchParams } from 'next/navigation'
-import { Home, Truck, Receipt, User } from 'lucide-react'
+import { Home, Truck, Search } from 'lucide-react'
 
 const navItems = [
     { label: 'INICIO', icon: Home, href: '/dashboard' },
     { label: 'VIAJES', icon: Truck, href: '/dashboard?filter=todo' },
-    { label: 'GASTOS', icon: Receipt, href: '/expenses' },
-    { label: 'PERFIL', icon: User, href: '/profile' },
+    { label: 'BUSCAR', icon: Search, href: '/dashboard?search=active' },
 ]
 
 export function BottomNav() {
@@ -18,12 +17,13 @@ export function BottomNav() {
 
     const isItemActive = (href: string) => {
         if (href === '/dashboard' && !href.includes('?')) {
-            // INICIO: activo solo si estamos en /dashboard SIN filter=todo
-            return pathname === '/dashboard' && currentFilter !== 'todo'
+            return pathname === '/dashboard' && !currentFilter && !searchParams.get('search')
         }
         if (href === '/dashboard?filter=todo') {
-            // VIAJES: activo si estamos en /dashboard con filter=todo
             return pathname === '/dashboard' && currentFilter === 'todo'
+        }
+        if (href === '/dashboard?search=active') {
+            return pathname === '/dashboard' && searchParams.get('search') === 'active'
         }
         return pathname === href
     }
