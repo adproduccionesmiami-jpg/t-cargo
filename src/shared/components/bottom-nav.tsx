@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { usePathname, useSearchParams } from 'next/navigation'
 import { Home, Truck, Search } from 'lucide-react'
+import { Suspense } from 'react'
 
 const navItems = [
     { label: 'INICIO', icon: Home, href: '/dashboard' },
@@ -11,6 +12,14 @@ const navItems = [
 ]
 
 export function BottomNav() {
+    return (
+        <Suspense fallback={null}>
+            <BottomNavContent />
+        </Suspense>
+    )
+}
+
+function BottomNavContent() {
     const pathname = usePathname()
     const searchParams = useSearchParams()
     const currentFilter = searchParams.get('filter')

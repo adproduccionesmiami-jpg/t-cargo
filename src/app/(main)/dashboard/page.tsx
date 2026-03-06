@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Plus, List, Search, X, Calendar as CalendarIcon, Filter, Download, LogOut } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
@@ -11,6 +11,30 @@ import { Drawer } from '@/shared/components/drawer'
 import { NewTripForm } from '@/features/dashboard/components/new-trip-form'
 
 export default function DashboardPage() {
+  return (
+    <Suspense fallback={
+      <div className="p-6 space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+        <header className="flex justify-between items-center px-6 py-2 mb-0">
+          <h1 className="text-4xl font-black text-slate-900 tracking-tighter uppercase whitespace-nowrap">
+            Inicio
+          </h1>
+        </header>
+        <div className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {[1, 2, 3].map(i => (
+              <div key={i} className="h-40 bg-gray-100 rounded-3xl animate-pulse" />
+            ))}
+          </div>
+          <div className="h-60 bg-gray-50 rounded-3xl animate-pulse" />
+        </div>
+      </div>
+    }>
+      <DashboardContent />
+    </Suspense>
+  )
+}
+
+function DashboardContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const [data, setData] = useState<{ trips: TripFinancials[], totals: { income: number, expenses: number, utility: number } }>({
