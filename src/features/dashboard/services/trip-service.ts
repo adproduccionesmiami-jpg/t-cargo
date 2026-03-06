@@ -1,18 +1,26 @@
 import { createClient } from '@/lib/supabase/client'
 
 export interface TripFinancials {
-    trip_id: string;
+    id: string;
     trip_date: string;
-    plate_number: string;
+    plate: string;
+    vehicle_alias?: string;
     status: string;
-    fx_rate: number;
-    total_income_cup: number;
-    total_income_usd_equiv: number;
-    total_expenses_usd_equiv: number;
-    driver_fee_usd: number;
-    broker_fee_usd: number;
-    net_utility_usd: number;
-    partner_share_usd: number;
+    fx_usd_to_cup: number;
+    amount_currency: string;
+    amount_value: number;
+    income_usd_equiv: number;
+    expenses_usd_equiv: number;
+    driver_fee_usd_equiv: number;
+    broker_fee_usd_equiv: number;
+    profit_usd_equiv: number;
+    partner_a_share_usd: number;
+    partner_b_share_usd: number;
+    km_recorridos?: number; // Calculado en BD (mileage_end - mileage_start)
+    origin?: string;
+    destination?: string;
+    mileage_start?: number;
+    mileage_end?: number;
 }
 
 export interface Vehicle {
@@ -24,31 +32,22 @@ export interface Vehicle {
 export type DashboardFilter = 'hoy' | 'mes' | 'todo';
 
 export const tripService = {
-    async getDashboardData(filter: DashboardFilter = 'todo'): Promise<TripFinancials[]> {
+    async getDashboardData(filter: DashboardFilter = 'todo'): Promise<{ trips: TripFinancials[], totals: { income: number, expenses: number, utility: number } }> {
         const supabase = createClient()
-        let query = supabase
-            .from('trip_financials')
-            .select('*')
-            .order('trip_date', { ascending: false })
 
-        const now = new Date()
-        const today = now.toISOString().split('T')[0]
-
-        if (filter === 'hoy') {
-            query = query.eq('trip_date', today)
-        } else if (filter === 'mes') {
-            const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0]
-            query = query.gte('trip_date', startOfMonth).lte('trip_date', today)
-        }
-
-        const { data, error } = await query
+        const { data, error } = await supabase
+            .rpc('get_dashboard_data_v2', { filter_type: filter })
 
         if (error) {
             console.error('Error fetching dashboard data:', error)
-            return []
+            return { trips: [], totals: { income: 0, expenses: 0, utility: 0 } }
         }
 
-        return data || []
+        // Parse JSON output when get_dashboard_data_v2 returns the function wrapper
+        const parsed = (data as any)
+        const mappedData = Object.keys(parsed || {}).includes('trips') ? parsed : (parsed?.[0]?.get_dashboard_data_v2 || { trips: [], totals: { income: 0, expenses: 0, utility: 0 } });
+
+        return mappedData as { trips: TripFinancials[], totals: { income: number, expenses: number, utility: number } }
     },
 
     async getVehicles(): Promise<Vehicle[]> {
@@ -76,6 +75,7 @@ export const tripService = {
         destination?: string;
         mileage_start?: number;
         mileage_end?: number;
+        created_by_user_id: string;
     }) {
         const supabase = createClient()
 
@@ -100,6 +100,38 @@ export const tripService = {
 
         if (error) throw error
         return data?.[0]
+    },
+
+    async getTripById(tripId: string): Promise<TripFinancials | null> {
+        const supabase = createClient()
+        const { data, error } = await supabase
+            .from('trip_financials')
+            .select('*')
+            .eq('id', tripId)
+            .single()
+
+        if (error) {
+            console.error('Error fetching trip by ID:', error)
+            return null
+        }
+
+        return data
+    },
+
+    async getTripExpenses(tripId: string) {
+        const supabase = createClient()
+        const { data, error } = await supabase
+            .from('trip_expenses')
+            .select('*')
+            .eq('trip_id', tripId)
+            .order('creado_en', { ascending: false })
+
+        if (error) {
+            console.error('Error fetching trip expenses:', error)
+            return []
+        }
+
+        return data
     }
 }
 

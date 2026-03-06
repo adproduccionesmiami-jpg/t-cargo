@@ -64,6 +64,12 @@ T-Cargo no es una colección de pantallas, es un flujo operativo controlado para
 - Máximo 3 taps para llegar a operaciones críticas.
 - Tablas con scroll horizontal controlado en móvil.
 
-## 11. Estado del Documento
+## 12. Actualizaciones de Implementación (BD-First)
 
-**APROBADO**
+---
+
+### [2026-03-05]: Implementación de Detalle de Viaje
+
+- **Cambio:** Se han añadido los servicios `getTripById` y `getTripExpenses` en `trip-service.ts`.
+- **Lógica:** Consumo directo de la vista `trip_financials` para asegurar coherencia total con los cálculos del backend.
+- **Estado:** Pendiente de implementación de la UI en `/trips/[id]`.

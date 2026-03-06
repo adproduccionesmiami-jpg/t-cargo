@@ -89,13 +89,11 @@ export function KPIGrid({ totalIncome, totalExpenses, totalUtility }: KPIGridPro
                 <KPICard
                     title="INGRESOS"
                     value={totalIncome}
-                    trend="+12.5%"
                     trendUp={true}
                 />
                 <KPICard
                     title="GASTOS"
                     value={totalExpenses}
-                    trend="-2.4%"
                     trendUp={false}
                 />
             </div>

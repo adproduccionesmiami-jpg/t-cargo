@@ -4,6 +4,7 @@ import { useEffect, useState, useRef } from 'react'
 import { Calendar, ChevronDown, Plus, Loader2, Truck } from 'lucide-react'
 import { tripService, Vehicle } from '../services/trip-service'
 import { getVehiclesAction } from '../actions/vehicle-actions'
+import { useAuthStore } from '@/features/auth/store/auth-store'
 
 interface NewTripFormProps {
     onSuccess: () => void
@@ -21,6 +22,7 @@ export function NewTripForm({ onSuccess, onCancel }: NewTripFormProps) {
     const [tripDate, setTripDate] = useState(new Date().toISOString().split('T')[0])
     const [mileageStart, setMileageStart] = useState('')
     const [mileageEnd, setMileageEnd] = useState('')
+    const [status, setStatus] = useState('En curso')
     const [origin, setOrigin] = useState('HABANA')
     const [destination, setDestination] = useState('MATANZAS')
     const [isPlateSelectorOpen, setIsPlateSelectorOpen] = useState(false)
@@ -54,8 +56,10 @@ export function NewTripForm({ onSuccess, onCancel }: NewTripFormProps) {
         loadVehicles()
     }, [])
 
+    const { user } = useAuthStore()
+
     const handleSubmit = async () => {
-        if (!selectedPlateId || isSubmitting) return
+        if (!selectedPlateId || isSubmitting || !user) return
 
         setIsSubmitting(true)
         try {
@@ -64,11 +68,12 @@ export function NewTripForm({ onSuccess, onCancel }: NewTripFormProps) {
                 plate_id: selectedPlateId,
                 amount_currency: currency,
                 amount_value: parseFloat(amount),
-                status: 'En curso', // Default status
+                status: status,
                 origin,
                 destination,
                 mileage_start: mileageStart ? parseFloat(mileageStart) : undefined,
-                mileage_end: mileageEnd ? parseFloat(mileageEnd) : undefined
+                mileage_end: mileageEnd ? parseFloat(mileageEnd) : undefined,
+                created_by_user_id: user.id
             })
             onSuccess()
         } catch (error) {
@@ -191,6 +196,30 @@ export function NewTripForm({ onSuccess, onCancel }: NewTripFormProps) {
                         />
                         <Calendar className="w-5 h-5 text-[#f59e0b] pointer-events-none" />
                     </div>
+                </div>
+            </div>
+
+            {/* Estado Input */}
+            <div className="space-y-2">
+                <label className="text-xs font-black text-[#0f172a] uppercase tracking-widest pl-1">Estado del Viaje</label>
+                <div className="bg-[#f8fafc] p-1.5 rounded-[1.5rem] flex items-center shadow-sm border border-transparent focus-within:bg-white focus-within:border-gray-200 transition-all relative z-10">
+                    {['En curso', 'Completado', 'Cancelado'].map((s) => (
+                        <button
+                            key={s}
+                            type="button"
+                            onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                setStatus(s);
+                            }}
+                            className={`flex-1 py-3 rounded-[1.2rem] text-[10px] font-black tracking-widest uppercase transition-all relative z-20 ${status === s
+                                    ? 'bg-[#0f172a] shadow-md text-white scale-105 select-none'
+                                    : 'text-slate-400 hover:bg-slate-200/50'
+                                }`}
+                        >
+                            {s}
+                        </button>
+                    ))}
                 </div>
             </div>
 

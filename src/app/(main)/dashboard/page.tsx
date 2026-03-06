@@ -1,7 +1,8 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Plus } from 'lucide-react'
+import { useSearchParams } from 'next/navigation'
+import { Plus, List } from 'lucide-react'
 import { KPIGrid } from '@/features/dashboard/components/kpi-grid'
 import { TripList } from '@/features/dashboard/components/trip-list'
 import { tripService, TripFinancials, DashboardFilter } from '@/features/dashboard/services/trip-service'
@@ -9,15 +10,27 @@ import { Drawer } from '@/shared/components/drawer'
 import { NewTripForm } from '@/features/dashboard/components/new-trip-form'
 
 export default function DashboardPage() {
-  const [trips, setTrips] = useState<TripFinancials[]>([])
+  const searchParams = useSearchParams()
+  const [data, setData] = useState<{ trips: TripFinancials[], totals: { income: number, expenses: number, utility: number } }>({
+    trips: [],
+    totals: { income: 0, expenses: 0, utility: 0 }
+  })
+  const [recentTrips, setRecentTrips] = useState<TripFinancials[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [isDrawerOpen, setIsDrawerOpen] = useState(false)
-  const [filter, setFilter] = useState<DashboardFilter>('todo')
+  const [filter, setFilter] = useState<DashboardFilter>(() => {
+    const f = searchParams.get('filter')
+    return (f === 'hoy' || f === 'mes' || f === 'todo') ? f : 'todo'
+  })
 
   const loadData = async (currentFilter: DashboardFilter) => {
     setIsLoading(true)
-    const data = await tripService.getDashboardData(currentFilter)
-    setTrips(data)
+    const [result, recent] = await Promise.all([
+      tripService.getDashboardData(currentFilter),
+      tripService.getDashboardData('todo')
+    ])
+    setData(result)
+    setRecentTrips(recent.trips.slice(0, 5))
     setIsLoading(false)
   }
 
@@ -25,25 +38,14 @@ export default function DashboardPage() {
     loadData(filter)
   }, [filter])
 
-  const totals = trips?.reduce((acc, trip) => ({
-    income: acc.income + Number(trip.total_income_usd_equiv || 0),
-    expenses: acc.expenses + Number(trip.total_expenses_usd_equiv || 0),
-    utility: acc.utility + Number(trip.net_utility_usd || 0)
-  }), { income: 0, expenses: 0, utility: 0 }) || { income: 0, expenses: 0, utility: 0 }
+  const { trips, totals } = data
 
   return (
     <div className="p-6 space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
-      <header className="flex justify-between items-center -mx-2">
-        <button
-          onClick={() => setIsDrawerOpen(true)}
-          className="w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-sm border border-gray-100 active:scale-90 transition-transform"
-        >
-          <Plus className="w-6 h-6 text-gray-400" />
-        </button>
-        <h1 className="text-xl font-black text-gray-900 tracking-tight">Detalle de Viaje</h1>
-        <div className="bg-[#fef7e0] px-4 py-1.5 rounded-full">
-          <span className="text-[10px] font-black text-[#f2b90d] uppercase tracking-widest">En Curso</span>
-        </div>
+      <header className="flex justify-start px-6 py-2 mb-0">
+        <h1 className="text-4xl font-black text-slate-900 tracking-tighter uppercase whitespace-nowrap">
+          Inicio
+        </h1>
       </header>
 
       {/* Filter Selector */}
@@ -94,7 +96,7 @@ export default function DashboardPage() {
 
           <section className="space-y-4">
             <div className="flex items-center justify-between">
-              <h2 className="text-xl font-black text-gray-900 tracking-tight">Gastos Recientes</h2>
+              <h2 className="text-xl font-black text-gray-900 tracking-tight">Viajes Recientes</h2>
               <button
                 onClick={() => setFilter('todo')}
                 className="text-[10px] font-black text-[#f2b90d] uppercase tracking-widest hover:opacity-70 transition-opacity"
@@ -102,7 +104,7 @@ export default function DashboardPage() {
                 Ver Todo
               </button>
             </div>
-            <TripList trips={trips} />
+            <TripList trips={filter === 'hoy' && trips.length === 0 ? recentTrips : trips} />
           </section>
         </>
       )}
@@ -113,14 +115,14 @@ export default function DashboardPage() {
           className="btn-crextio w-full"
         >
           <Plus className="w-5 h-5 fill-current" />
-          <span>Agregar Gasto</span>
+          <span>Nuevo Viaje</span>
         </button>
         <button
-          onClick={() => setIsDrawerOpen(true)}
+          onClick={() => setFilter('todo')}
           className="btn-secondary-crextio w-full"
         >
-          <Plus className="w-5 h-5 rotate-45" />
-          <span>Actualizar FX</span>
+          <List className="w-5 h-5 text-amber-500" />
+          <span>Historial de Viajes</span>
         </button>
       </div>
 
