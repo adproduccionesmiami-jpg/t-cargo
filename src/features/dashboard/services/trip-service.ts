@@ -13,6 +13,7 @@ export interface TripFinancials {
     expenses_usd_equiv: number;
     driver_fee_usd_equiv: number;
     broker_fee_usd_equiv: number;
+    total_expenses_usd_equiv: number; // Suma total de gastos
     profit_usd_equiv: number;
     partner_a_share_usd: number;
     partner_b_share_usd: number;
@@ -207,5 +208,70 @@ export const tripService = {
 
         if (error) throw error
         return data as unknown as TripFinancials
+    },
+
+    // Exportación a CSV — Usa los mismos datos financieros blindados de la vista
+    exportToCsv(trips: TripFinancials[]) {
+        if (trips.length === 0) return;
+
+        // Cabeceras según PRP
+        const headers = [
+            'Fecha',
+            'Chapa',
+            'Origen',
+            'Destino',
+            'Status',
+            'Monto Original',
+            'Moneda',
+            'Tasa FX',
+            'Ingreso (USD)',
+            'Gasto Combustible (USD)',
+            'Gasto Total (USD)',
+            'Utilidad Neta (USD)',
+            'Socio A (USD)',
+            'Socio B (USD)',
+            'KM Totales',
+            'Rendimiento (KM/L)'
+        ];
+
+        // Mapeo de filas
+        const rows = trips.map(t => [
+            t.trip_date,
+            t.plate,
+            t.origin || '',
+            t.destination || '',
+            t.status,
+            t.amount_value,
+            t.amount_currency,
+            t.fx_usd_to_cup,
+            t.income_usd_equiv.toFixed(2),
+            (t.fuel_cost_usd || 0).toFixed(2),
+            t.total_expenses_usd_equiv.toFixed(2),
+            t.profit_usd_equiv.toFixed(2),
+            t.partner_a_share_usd.toFixed(2),
+            t.partner_b_share_usd.toFixed(2),
+            t.km_recorridos || 0,
+            (t.fuel_yield_actual || 0).toFixed(2)
+        ]);
+
+        // Construir contenido CSV (comma separated values)
+        // Usamos punto y coma como separador para mejor compatibilidad con Excel en español
+        const csvContent = [
+            headers.join(';'),
+            ...rows.map(r => r.join(';'))
+        ].join('\n');
+
+        // Crear el archivo y descargar
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        const filename = `reporte-viajes-${new Date().toISOString().split('T')[0]}.csv`;
+
+        link.setAttribute('href', url);
+        link.setAttribute('download', filename);
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
     }
 }

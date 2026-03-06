@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { Plus, List, Search, X, Calendar as CalendarIcon, Filter } from 'lucide-react'
+import { Plus, List, Search, X, Calendar as CalendarIcon, Filter, Download } from 'lucide-react'
 import { KPIGrid } from '@/features/dashboard/components/kpi-grid'
 import { TripList } from '@/features/dashboard/components/trip-list'
 import { tripService, TripFinancials, DashboardFilter } from '@/features/dashboard/services/trip-service'
@@ -99,9 +99,20 @@ export default function DashboardPage() {
 
       {/* Filter Selector - Temporalidad */}
       <div className="flex flex-col gap-4 px-2">
-        <div className="flex items-center gap-2 mb-1 px-4">
-          <Filter className="w-3.5 h-3.5 text-slate-400" />
-          <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Temporalidad</span>
+        <div className="flex items-center justify-between mb-1 px-4">
+          <div className="flex items-center gap-2">
+            <Filter className="w-3.5 h-3.5 text-slate-400" />
+            <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Temporalidad</span>
+          </div>
+          {trips.length > 0 && (
+            <button
+              onClick={() => tripService.exportToCsv(trips)}
+              className="flex items-center gap-2 px-3 py-1.5 bg-slate-100 hover:bg-slate-200 rounded-full transition-all active:scale-95 group"
+            >
+              <Download className="w-3 h-3 text-slate-500 group-hover:text-[#0f172a]" />
+              <span className="text-[9px] font-black text-slate-500 group-hover:text-[#0f172a] uppercase tracking-wider">Exportar CSV</span>
+            </button>
+          )}
         </div>
         <div className="bg-slate-100/50 p-1.5 rounded-full flex items-center shadow-inner border border-slate-100 w-full max-w-sm mx-auto">
           <button
