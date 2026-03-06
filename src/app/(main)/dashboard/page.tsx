@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useSearchParams } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { Plus, List } from 'lucide-react'
 import { KPIGrid } from '@/features/dashboard/components/kpi-grid'
 import { TripList } from '@/features/dashboard/components/trip-list'
@@ -10,6 +10,7 @@ import { Drawer } from '@/shared/components/drawer'
 import { NewTripForm } from '@/features/dashboard/components/new-trip-form'
 
 export default function DashboardPage() {
+  const router = useRouter()
   const searchParams = useSearchParams()
   const [data, setData] = useState<{ trips: TripFinancials[], totals: { income: number, expenses: number, utility: number } }>({
     trips: [],
@@ -133,9 +134,13 @@ export default function DashboardPage() {
         title="Nuevo Viaje"
       >
         <NewTripForm
-          onSuccess={() => {
+          onSuccess={(tripId) => {
             setIsDrawerOpen(false)
-            loadData(filter)
+            if (tripId) {
+              router.push(`/trips/${tripId}`)
+            } else {
+              loadData(filter)
+            }
           }}
           onCancel={() => setIsDrawerOpen(false)}
         />

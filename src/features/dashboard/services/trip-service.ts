@@ -21,12 +21,29 @@ export interface TripFinancials {
     destination?: string;
     mileage_start?: number;
     mileage_end?: number;
+    fuel_cost_usd?: number;
+    fuel_yield_actual?: number;
+    fuel_liters?: number;
+    fuel_price_per_liter?: number;
+    fuel_currency?: 'USD' | 'CUP';
+    notes?: string;
 }
 
 export interface Vehicle {
     id: string;
     plate: string;
     alias?: string;
+}
+
+export interface TripExpense {
+    id: string;
+    trip_id: string;
+    expense_type: 'fuel' | 'broker_fee' | 'driver_fee' | 'maintenance' | 'other';
+    currency: 'USD' | 'CUP';
+    amount: number;
+    equivalent_usd: number;
+    created_by_user_id: string;
+    creado_en: string;
 }
 
 export type DashboardFilter = 'hoy' | 'mes' | 'todo';
@@ -105,6 +122,48 @@ export const tripService = {
         return data as string // uuid del viaje creado
     },
 
+    // Detalle completo del viaje: financials + gastos — un solo RPC
+    async getTripDetail(tripId: string): Promise<{ trip: TripFinancials, expenses: TripExpense[] } | null> {
+        const supabase = createClient()
+        const { data, error } = await supabase
+            .rpc('get_trip_detail', { p_trip_id: tripId })
+
+        if (error) {
+            console.error('Error fetching trip detail:', error)
+            return null
+        }
+
+        return data as unknown as { trip: TripFinancials, expenses: TripExpense[] }
+    },
+
+    // Cambia el estado del viaje — validaciones y auditoría en BD
+    async updateTripStatus(tripId: string, newStatus: string, mileageEnd?: number): Promise<TripFinancials | null> {
+        const supabase = createClient()
+        const { data, error } = await supabase
+            .rpc('update_trip_status', {
+                p_trip_id: tripId,
+                p_new_status: newStatus,
+                p_mileage_end: mileageEnd ?? null,
+            })
+
+        if (error) throw error
+        return data as unknown as TripFinancials
+    },
+
+    // Actualiza la tasa FX — BD recalcula todos los montos equiv automáticamente
+    async updateTripFx(tripId: string, fxRate: number): Promise<TripFinancials | null> {
+        const supabase = createClient()
+        const { data, error } = await supabase
+            .rpc('update_trip_fx', {
+                p_trip_id: tripId,
+                p_fx_rate: fxRate,
+            })
+
+        if (error) throw error
+        return data as unknown as TripFinancials
+    },
+
+    // Mantenidos por compatibilidad (usan la vista directamente)
     async getTripById(tripId: string): Promise<TripFinancials | null> {
         const supabase = createClient()
         const { data, error } = await supabase
@@ -113,15 +172,11 @@ export const tripService = {
             .eq('id', tripId)
             .single()
 
-        if (error) {
-            console.error('Error fetching trip by ID:', error)
-            return null
-        }
-
+        if (error) return null
         return data
     },
 
-    async getTripExpenses(tripId: string) {
+    async getTripExpenses(tripId: string): Promise<TripExpense[]> {
         const supabase = createClient()
         const { data, error } = await supabase
             .from('trip_expenses')
@@ -129,12 +184,28 @@ export const tripService = {
             .eq('trip_id', tripId)
             .order('creado_en', { ascending: false })
 
-        if (error) {
-            console.error('Error fetching trip expenses:', error)
-            return []
-        }
+        if (error) return []
+        return data || []
+    },
 
-        return data
+    // Actualiza detalles como combustible y notas
+    async updateTripDetails(params: {
+        tripId: string;
+        fuelLiters: number;
+        fuelPrice: number;
+        fuelCurrency: 'USD' | 'CUP';
+        notes: string;
+    }): Promise<TripFinancials | null> {
+        const supabase = createClient()
+        const { data, error } = await supabase.rpc('update_trip_details', {
+            p_trip_id: params.tripId,
+            p_fuel_liters: params.fuelLiters,
+            p_fuel_price: params.fuelPrice,
+            p_fuel_currency: params.fuelCurrency,
+            p_notes: params.notes,
+        })
+
+        if (error) throw error
+        return data as unknown as TripFinancials
     }
 }
-

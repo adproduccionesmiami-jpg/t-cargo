@@ -6,7 +6,7 @@ import { tripService, Vehicle } from '../services/trip-service'
 import { getVehiclesAction } from '../actions/vehicle-actions'
 
 interface NewTripFormProps {
-    onSuccess: () => void
+    onSuccess: (tripId?: string) => void
     onCancel?: () => void
 }
 
@@ -64,7 +64,7 @@ export function NewTripForm({ onSuccess, onCancel }: NewTripFormProps) {
 
         setIsSubmitting(true)
         try {
-            await tripService.createTrip({
+            const tripId = await tripService.createTrip({
                 trip_date: tripDate,
                 plate_id: selectedPlateId,
                 amount_currency: currency,
@@ -73,7 +73,7 @@ export function NewTripForm({ onSuccess, onCancel }: NewTripFormProps) {
                 destination,
                 mileage_start: mileageStart ? parseFloat(mileageStart) : undefined,
             })
-            onSuccess()
+            onSuccess(tripId)
         } catch (error) {
             console.error('Error creating trip:', error)
             alert('Error al crear el viaje. Por favor intente de nuevo.')
