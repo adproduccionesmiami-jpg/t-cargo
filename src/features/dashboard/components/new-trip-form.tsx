@@ -74,9 +74,10 @@ export function NewTripForm({ onSuccess, onCancel }: NewTripFormProps) {
                 mileage_start: mileageStart ? parseFloat(mileageStart) : undefined,
             })
             onSuccess(tripId)
-        } catch (error) {
+        } catch (error: any) {
             console.error('Error creating trip:', error)
-            alert('Error al crear el viaje. Por favor intente de nuevo.')
+            const errorMsg = error?.message || error?.details || JSON.stringify(error)
+            alert(`Error al crear el viaje: ${errorMsg}`)
         } finally {
             setIsSubmitting(false)
         }

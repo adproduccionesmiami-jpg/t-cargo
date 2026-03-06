@@ -138,7 +138,7 @@ export function LoginForm() {
             {/* Sutil Branding Exterior - Solo visible en tablets/desktop para no estorbar en móvil */}
             <div className="hidden sm:block absolute bottom-8 text-center w-full z-10">
                 <p className="text-[10px] font-black text-white/20 uppercase tracking-[0.4em]">
-                    Intelligent Global Logistics Platform
+                    Plataforma Logística 2026
                 </p>
             </div>
         </div>
