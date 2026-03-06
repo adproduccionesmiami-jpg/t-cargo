@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { Plus, List, Search, X, Calendar as CalendarIcon, Filter, Download } from 'lucide-react'
+import { Plus, List, Search, X, Calendar as CalendarIcon, Filter, Download, LogOut } from 'lucide-react'
+import { createClient } from '@/lib/supabase/client'
 import { KPIGrid } from '@/features/dashboard/components/kpi-grid'
 import { TripList } from '@/features/dashboard/components/trip-list'
 import { tripService, TripFinancials, DashboardFilter } from '@/features/dashboard/services/trip-service'
@@ -18,6 +19,13 @@ export default function DashboardPage() {
   })
   const [recentTrips, setRecentTrips] = useState<TripFinancials[]>([])
   const [isLoading, setIsLoading] = useState(true)
+  const supabase = createClient()
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut()
+    router.push('/login')
+    router.refresh()
+  }
   const [isDrawerOpen, setIsDrawerOpen] = useState(false)
   const [filter, setFilter] = useState<DashboardFilter>(() => {
     const f = searchParams.get('filter')
@@ -67,10 +75,17 @@ export default function DashboardPage() {
 
   return (
     <div className="p-6 space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
-      <header className="flex justify-start px-6 py-2 mb-0">
+      <header className="flex justify-between items-center px-6 py-2 mb-0">
         <h1 className="text-4xl font-black text-slate-900 tracking-tighter uppercase whitespace-nowrap">
           Inicio
         </h1>
+        <button
+          onClick={handleLogout}
+          className="p-3 bg-slate-100 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-2xl transition-all active:scale-95"
+          title="Cerrar Sesión"
+        >
+          <LogOut className="w-5 h-5" />
+        </button>
       </header>
 
       {/* Search Bar - Condicional */}
