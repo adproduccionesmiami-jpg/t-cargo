@@ -105,9 +105,9 @@ Resumen calculado en BD con:
 | :--- | :--- | :--- |
 | equivalent_usd | trip_expenses | `si USD → amount; si CUP → amount / fx_usd_to_cup` |
 | income_usd_equiv | trip_financials | `si USD → amount; si CUP → amount / fx_usd_to_cup` |
-| driver_fee | trip_financials | `income_usd_equiv * 0.05` |
-| broker_fee | trip_financials | `income_usd_equiv * 0.05` |
-| profit_usd_equiv| trip_financials | `income - expenses - driver_fee - broker_fee` |
+| driver_fee | trip_financials | `(income_usd_equiv - fuel_cost_usd) * 0.05` |
+| broker_fee | trip_financials | `(income_usd_equiv - fuel_cost_usd) * 0.05` |
+| profit_usd_equiv| trip_financials | `income_usd_equiv - expenses_usd_equiv - driver_fee - broker_fee - fuel_cost_usd` |
 | shares (50/50) | trip_financials | `profit_usd_equiv * 0.5` |
 
 ## 11. Estado del Documento
