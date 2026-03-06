@@ -1,10 +1,9 @@
 'use client'
 
 import { useEffect, useState, useRef } from 'react'
-import { Calendar, ChevronDown, Plus, Loader2, Truck } from 'lucide-react'
+import { ChevronDown, Plus, Loader2, Truck } from 'lucide-react'
 import { tripService, Vehicle } from '../services/trip-service'
 import { getVehiclesAction } from '../actions/vehicle-actions'
-import { useAuthStore } from '@/features/auth/store/auth-store'
 
 interface NewTripFormProps {
     onSuccess: () => void
@@ -19,10 +18,8 @@ export function NewTripForm({ onSuccess, onCancel }: NewTripFormProps) {
     const [currency, setCurrency] = useState<'USD' | 'CUP'>('USD')
     const [amount, setAmount] = useState('0.00')
     const [selectedPlateId, setSelectedPlateId] = useState('')
-    const [tripDate, setTripDate] = useState(new Date().toISOString().split('T')[0])
+    const [tripDate, setTripDate] = useState('')  // Se inicializa con CURRENT_DATE del servidor
     const [mileageStart, setMileageStart] = useState('')
-    const [mileageEnd, setMileageEnd] = useState('')
-    const [status, setStatus] = useState('En curso')
     const [origin, setOrigin] = useState('HABANA')
     const [destination, setDestination] = useState('MATANZAS')
     const [isPlateSelectorOpen, setIsPlateSelectorOpen] = useState(false)
@@ -53,13 +50,17 @@ export function NewTripForm({ onSuccess, onCancel }: NewTripFormProps) {
                 setIsLoadingVehicles(false)
             }
         }
+        // Cargar fecha del SERVIDOR (PostgreSQL CURRENT_DATE) — no de JS
+        async function loadServerDate() {
+            const date = await tripService.getServerDate()
+            setTripDate(date)
+        }
         loadVehicles()
+        loadServerDate()
     }, [])
 
-    const { user } = useAuthStore()
-
     const handleSubmit = async () => {
-        if (!selectedPlateId || isSubmitting || !user) return
+        if (!selectedPlateId || isSubmitting) return
 
         setIsSubmitting(true)
         try {
@@ -68,12 +69,9 @@ export function NewTripForm({ onSuccess, onCancel }: NewTripFormProps) {
                 plate_id: selectedPlateId,
                 amount_currency: currency,
                 amount_value: parseFloat(amount),
-                status: status,
                 origin,
                 destination,
                 mileage_start: mileageStart ? parseFloat(mileageStart) : undefined,
-                mileage_end: mileageEnd ? parseFloat(mileageEnd) : undefined,
-                created_by_user_id: user.id
             })
             onSuccess()
         } catch (error) {
@@ -194,32 +192,7 @@ export function NewTripForm({ onSuccess, onCancel }: NewTripFormProps) {
                             onChange={(e) => setTripDate(e.target.value)}
                             className="bg-transparent border-none focus:ring-0 p-0 text-base font-black text-[#0f172a] w-full"
                         />
-                        <Calendar className="w-5 h-5 text-[#f59e0b] pointer-events-none" />
                     </div>
-                </div>
-            </div>
-
-            {/* Estado Input */}
-            <div className="space-y-2">
-                <label className="text-xs font-black text-[#0f172a] uppercase tracking-widest pl-1">Estado del Viaje</label>
-                <div className="bg-[#f8fafc] p-1.5 rounded-[1.5rem] flex items-center shadow-sm border border-transparent focus-within:bg-white focus-within:border-gray-200 transition-all relative z-10">
-                    {['En curso', 'Completado', 'Cancelado'].map((s) => (
-                        <button
-                            key={s}
-                            type="button"
-                            onClick={(e) => {
-                                e.preventDefault();
-                                e.stopPropagation();
-                                setStatus(s);
-                            }}
-                            className={`flex-1 py-3 rounded-[1.2rem] text-[10px] font-black tracking-widest uppercase transition-all relative z-20 ${status === s
-                                    ? 'bg-[#0f172a] shadow-md text-white scale-105 select-none'
-                                    : 'text-slate-400 hover:bg-slate-200/50'
-                                }`}
-                        >
-                            {s}
-                        </button>
-                    ))}
                 </div>
             </div>
 
@@ -275,20 +248,6 @@ export function NewTripForm({ onSuccess, onCancel }: NewTripFormProps) {
                                 type="number"
                                 value={mileageStart}
                                 onChange={(e) => setMileageStart(e.target.value)}
-                                className="bg-transparent border-none focus:ring-0 p-0 text-base font-black text-[#0f172a] w-full"
-                                placeholder="0"
-                            />
-                        </div>
-                    </div>
-                </div>
-                <div className="space-y-2">
-                    <label className="text-xs font-black text-[#0f172a] uppercase tracking-widest pl-1">Millaje Apagado</label>
-                    <div className="relative group">
-                        <div className="w-full bg-[#f8fafc] border border-transparent rounded-[1.5rem] py-4 px-6 flex items-center group-focus-within:bg-white group-focus-within:border-gray-200 transition-all shadow-sm">
-                            <input
-                                type="number"
-                                value={mileageEnd}
-                                onChange={(e) => setMileageEnd(e.target.value)}
                                 className="bg-transparent border-none focus:ring-0 p-0 text-base font-black text-[#0f172a] w-full"
                                 placeholder="0"
                             />

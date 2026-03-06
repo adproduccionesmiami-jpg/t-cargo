@@ -65,41 +65,44 @@ export const tripService = {
         return data || []
     },
 
+    // Devuelve la fecha actual del SERVIDOR (PostgreSQL CURRENT_DATE)
+    // Evita bugs de timezone del navegador al inicializar el date picker
+    async getServerDate(): Promise<string> {
+        const supabase = createClient()
+        const { data, error } = await supabase.rpc('get_server_date')
+        if (error || !data) {
+            console.error('Error fetching server date:', error)
+            // Fallback seguro: fecha local del sistema (solo si la BD falla)
+            return new Date().toLocaleDateString('en-CA')
+        }
+        return data as string
+    },
+
+    // Crea un viaje — toda la lógica (FX rate, user_id, status) resuelta en BD
+    // El frontend solo envía los inputs del usuario, sin calcular nada
     async createTrip(tripData: {
         trip_date: string;
         plate_id: string;
         amount_currency: 'USD' | 'CUP';
         amount_value: number;
-        status: string;
         origin?: string;
         destination?: string;
         mileage_start?: number;
-        mileage_end?: number;
-        created_by_user_id: string;
     }) {
         const supabase = createClient()
 
-        // Get current FX rate (this is a bit simplified, usually you'd have a settings table)
-        // For now, let's assume a default or fetch from the last trip
-        const { data: lastTrip } = await supabase
-            .from('trips')
-            .select('fx_usd_to_cup')
-            .order('created_at', { ascending: false })
-            .limit(1)
-            .single()
-
-        const fx_rate = lastTrip?.fx_usd_to_cup || 350 // Default fallback
-
-        const { data, error } = await supabase
-            .from('trips')
-            .insert({
-                ...tripData,
-                fx_usd_to_cup: fx_rate
-            })
-            .select()
+        const { data, error } = await supabase.rpc('create_trip', {
+            p_plate_id: tripData.plate_id,
+            p_amount_currency: tripData.amount_currency,
+            p_amount_value: tripData.amount_value,
+            p_trip_date: tripData.trip_date,
+            p_origin: tripData.origin ?? null,
+            p_destination: tripData.destination ?? null,
+            p_mileage_start: tripData.mileage_start ?? null,
+        })
 
         if (error) throw error
-        return data?.[0]
+        return data as string // uuid del viaje creado
     },
 
     async getTripById(tripId: string): Promise<TripFinancials | null> {
