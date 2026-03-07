@@ -171,7 +171,8 @@ export default function TripDetailPage({ params }: PageProps) {
                 </div>
                 <div className={`px-4 py-2 rounded-2xl transition-colors shadow-sm border ${trip.status === 'Completado' ? 'bg-green-50 border-green-100 text-green-600' :
                     trip.status === 'Cancelado' ? 'bg-red-50 border-red-100 text-red-600' :
-                        'bg-amber-50 border-amber-100 text-amber-600'
+                        trip.status === 'En curso' ? 'bg-blue-50 border-blue-100 text-blue-600' :
+                            'bg-slate-100 border-slate-200 text-slate-600' // Programado
                     }`}>
                     <span className="text-[10px] font-black uppercase tracking-widest">{trip.status}</span>
                 </div>
@@ -455,8 +456,11 @@ export default function TripDetailPage({ params }: PageProps) {
                             disabled={isUpdatingStatus}
                             onClick={() => handleStatusChange(s)}
                             className={`flex-1 py-4 rounded-[1.4rem] text-[11px] font-black tracking-widest uppercase transition-all relative z-10 ${trip.status === s
-                                ? 'bg-[#0f172a] shadow-xl text-white scale-[1.03]'
-                                : 'text-slate-400 hover:bg-slate-200/40'
+                                    ? s === 'Completado' ? 'bg-green-500 shadow-xl text-white scale-[1.03]'
+                                        : s === 'Cancelado' ? 'bg-red-500 shadow-xl text-white scale-[1.03]'
+                                            : s === 'En curso' ? 'bg-blue-500 shadow-xl text-white scale-[1.03]'
+                                                : 'bg-[#0f172a] shadow-xl text-white scale-[1.03]'
+                                    : 'text-slate-400 hover:bg-slate-200/40'
                                 }`}
                         >
                             {isUpdatingStatus && pendingStatus === s ? (

@@ -27,7 +27,11 @@ export function TripCard({ trip }: TripCardProps) {
                     <h3 className="text-sm font-black text-gray-900 tracking-tight flex items-center gap-2">
                         {trip.plate}
                         <span className="w-1 h-1 rounded-full bg-gray-300"></span>
-                        <span className="text-amber-500 uppercase text-[10px] tracking-wider">{trip.status}</span>
+                        <span className={`uppercase text-[10px] tracking-wider ${trip.status === 'Completado' ? 'text-green-500' :
+                                trip.status === 'Cancelado' ? 'text-red-500' :
+                                    trip.status === 'En curso' ? 'text-blue-500' :
+                                        'text-slate-500'
+                            }`}>{trip.status}</span>
                     </h3>
                     <p className="text-[10px] font-bold text-gray-400 mt-0.5 uppercase tracking-widest">
                         {new Date(trip.trip_date + 'T00:00:00').toLocaleDateString('es-ES', { day: 'numeric', month: 'short' })} • {trip.amount_value.toLocaleString()} {trip.amount_currency}
