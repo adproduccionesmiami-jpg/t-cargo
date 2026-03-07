@@ -105,6 +105,8 @@ Resumen calculado en BD con:
 | :--- | :--- | :--- |
 | equivalent_usd | trip_expenses | `si USD → amount; si CUP → amount / fx_usd_to_cup` |
 | income_usd_equiv | trip_financials | `si USD → amount; si CUP → amount / fx_usd_to_cup` |
+| km_recorridos | trip_financials | `(mileage_end - mileage_start) * 1.609344` |
+| fuel_yield_actual | trip_financials | `km_recorridos / fuel_liters` |
 | driver_fee | trip_financials | `(income_usd_equiv - fuel_cost_usd) * 0.05` |
 | broker_fee | trip_financials | `(income_usd_equiv - fuel_cost_usd) * 0.05` |
 | profit_usd_equiv| trip_financials | `income_usd_equiv - expenses_usd_equiv - driver_fee - broker_fee - fuel_cost_usd` |
