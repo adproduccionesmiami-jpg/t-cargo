@@ -204,7 +204,7 @@ export default function TripDetailPage({ params }: PageProps) {
                     <div className="bg-[#f8fafc] rounded-3xl p-5 flex flex-col justify-center items-center text-center border border-slate-100">
                         <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-1">RECORRIDO</p>
                         <p className="text-4xl font-black text-[#0f172a] tracking-tighter">
-                            {trip.mileage_end ? (trip.km_recorridos || '0') : '0'}
+                            {trip.mileage_end ? Number(trip.km_recorridos || 0).toLocaleString('es-ES', { maximumFractionDigits: 1 }) : '0'}
                         </p>
                         <p className="text-[10px] font-black text-[#f59e0b] mt-1 tracking-widest">KM TOTALES</p>
                     </div>
