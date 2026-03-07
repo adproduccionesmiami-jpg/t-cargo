@@ -41,8 +41,17 @@ T-Cargo no es una colección de pantallas, es un flujo operativo controlado para
 
 ## 4. Flujo de Navegación Principal
 
-1. Login -> 2. Viajes (Lista) -> 3. Tap en Fila -> 4. Detalle de Viaje -> 5. Operar (Gasto/FX/Estado).
+1. Login -> 2. Viajes (Lista) o Paquetes (Lista) vía Menú Inferior.
+2. Tap en Fila de Viaje -> Detalle de Viaje -> Operar (Gasto/FX/Estado).
+3. Tap en Fila de Entrega -> Detalle de Entrega -> Operar (Combustible/FX/Estado).
+
 *Si falla validación en BD:* Mostrar error claro y bloquear la acción en UI.
+
+## 4.1. Módulo Paquetería (Deliveries)
+
+- **Objetivo:** Gestión paralela para equipos bajo modelo de *Renta y Servicio*.
+- **Dashboards:** Independiente, accesible desde el menú inferior (Color Esmeralda).
+- **Detalles:** Operación neta al 50/50 entre socios. No aplica deducción de combustible (asumida por cliente) ni comisiones de terceros en la utilidad líquida.
 
 ## 5. Estados del Sistema
 
