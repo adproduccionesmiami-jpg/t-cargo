@@ -73,3 +73,8 @@ T-Cargo no es una colección de pantallas, es un flujo operativo controlado para
 - **Cambio:** Se han añadido los servicios `getTripById` y `getTripExpenses` en `trip-service.ts`.
 - **Lógica:** Consumo directo de la vista `trip_financials` para asegurar coherencia total con los cálculos del backend.
 - **Estado:** Pendiente de implementación de la UI en `/trips/[id]`.
+
+### [2026-03-06]: Refactor UI de Kilómetros
+
+- **Cambio:** Se ajustó la UI en `/trips/[id]/page.tsx` para redondear el campo `km_recorridos`.
+- **Lógica:** La conversión de millas a kilómetros (factor 1.609344) en la BD puede generar múltiples decimales. La UI obligatoriamente mostrará este valor formateado con **1 solo decimal** (`maximumFractionDigits: 1`) para mantener limpieza visual.
