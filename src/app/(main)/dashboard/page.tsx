@@ -143,15 +143,13 @@ function DashboardContent() {
             <Filter className="w-3.5 h-3.5 text-slate-400" />
             <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Temporalidad</span>
           </div>
-          {trips.length > 0 && (
-            <button
-              onClick={() => tripService.exportToCsv(trips)}
-              className="flex items-center gap-2 px-3 py-1.5 bg-slate-100 hover:bg-slate-200 rounded-full transition-all active:scale-95 group"
-            >
-              <Download className="w-3 h-3 text-slate-500 group-hover:text-[#0f172a]" />
-              <span className="text-[9px] font-black text-slate-500 group-hover:text-[#0f172a] uppercase tracking-wider">Exportar CSV</span>
-            </button>
-          )}
+          <button
+            onClick={() => tripService.exportToCsv(trips)}
+            className="flex items-center gap-2 px-3 py-1.5 bg-slate-100 hover:bg-slate-200 rounded-full transition-all active:scale-95 group"
+          >
+            <Download className="w-3 h-3 text-slate-500 group-hover:text-[#0f172a]" />
+            <span className="text-[9px] font-black text-slate-500 group-hover:text-[#0f172a] uppercase tracking-wider">Exportar CSV</span>
+          </button>
         </div>
         <div className="bg-slate-100/50 p-1.5 rounded-full flex items-center shadow-inner border border-slate-100 w-full max-w-sm mx-auto">
           <button
