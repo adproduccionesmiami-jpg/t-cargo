@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { Truck, Fuel, Utensils, Receipt, Settings, MoreHorizontal } from 'lucide-react'
 import { TripFinancials } from '../services/trip-service'
+import { formatCompactNumber } from '@/shared/lib/format-utils'
 
 interface TripCardProps {
     trip: TripFinancials;
@@ -28,9 +29,9 @@ export function TripCard({ trip }: TripCardProps) {
                         {trip.plate}
                         <span className="w-1 h-1 rounded-full bg-gray-300"></span>
                         <span className={`uppercase text-[10px] tracking-wider ${trip.status === 'Completado' ? 'text-green-500' :
-                                trip.status === 'Cancelado' ? 'text-red-500' :
-                                    trip.status === 'En curso' ? 'text-blue-500' :
-                                        'text-slate-500'
+                            trip.status === 'Cancelado' ? 'text-red-500' :
+                                trip.status === 'En curso' ? 'text-blue-500' :
+                                    'text-slate-500'
                             }`}>{trip.status}</span>
                     </h3>
                     <p className="text-[10px] font-bold text-gray-400 mt-0.5 uppercase tracking-widest">
@@ -46,7 +47,7 @@ export function TripCard({ trip }: TripCardProps) {
 
             <div className="text-right">
                 <div className="text-base font-black text-gray-900 tracking-tighter">
-                    +${(Number(trip.income_usd_equiv) || 0).toLocaleString('es-ES', { minimumFractionDigits: 0 })}
+                    +${formatCompactNumber(Number(trip.income_usd_equiv) || 0)}
                 </div>
                 <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
                     USD EQUIV

@@ -18,6 +18,7 @@ import {
     Save
 } from 'lucide-react'
 import { tripService, TripFinancials, TripExpense } from '@/features/dashboard/services/trip-service'
+import { formatCompactNumber } from '@/shared/lib/format-utils'
 
 interface PageProps {
     params: Promise<{ id: string }>
@@ -342,7 +343,7 @@ export default function TripDetailPage({ params }: PageProps) {
                             <TrendingDown className="w-4 h-4 text-amber-500" />
                             <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">CHOFER</span>
                         </div>
-                        <p className="text-lg font-black text-gray-900">${Number(trip.driver_fee_usd_equiv || 0).toLocaleString('es-ES')}</p>
+                        <p className="text-lg font-black text-gray-900">${formatCompactNumber(Number(trip.driver_fee_usd_equiv || 0))}</p>
                         <p className="text-[9px] font-bold text-gray-400 uppercase mt-1">COMISIÓN 5%</p>
                     </div>
                     <div className="bg-slate-50/50 border border-slate-100 p-5 rounded-2xl">
@@ -350,7 +351,7 @@ export default function TripDetailPage({ params }: PageProps) {
                             <TrendingDown className="w-4 h-4 text-slate-500" />
                             <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">BROKER</span>
                         </div>
-                        <p className="text-lg font-black text-gray-900">${Number(trip.broker_fee_usd_equiv || 0).toLocaleString('es-ES')}</p>
+                        <p className="text-lg font-black text-gray-900">${formatCompactNumber(Number(trip.broker_fee_usd_equiv || 0))}</p>
                         <p className="text-[9px] font-bold text-gray-400 uppercase mt-1">COMISIÓN 5%</p>
                     </div>
                 </div>
@@ -421,7 +422,7 @@ export default function TripDetailPage({ params }: PageProps) {
                         <div>
                             <p className="text-[11px] font-black text-[#f59e0b] uppercase tracking-[0.3em] mb-2">UTILIDAD NETA TOTAL</p>
                             <h2 className="text-5xl font-black text-white tracking-tighter">
-                                ${Number(trip.profit_usd_equiv || 0).toLocaleString('es-ES', { minimumFractionDigits: 0 })}
+                                ${formatCompactNumber(Number(trip.profit_usd_equiv || 0))}
                             </h2>
                         </div>
                         <div className="bg-white/10 p-5 rounded-3xl backdrop-blur-md border border-white/5">
@@ -432,11 +433,11 @@ export default function TripDetailPage({ params }: PageProps) {
                     <div className="grid grid-cols-2 gap-10 pt-8 border-t border-white/10 relative z-10">
                         <div className="group">
                             <p className="text-[11px] font-black text-gray-500 uppercase tracking-[0.2em] mb-1.5 group-hover:text-amber-500 transition-colors">Socio A (50%)</p>
-                            <p className="text-2xl font-black text-white tracking-tight">${Number(trip.partner_a_share_usd || 0).toLocaleString('es-ES')}</p>
+                            <p className="text-2xl font-black text-white tracking-tight">${formatCompactNumber(Number(trip.partner_a_share_usd || 0))}</p>
                         </div>
                         <div className="group">
                             <p className="text-[11px] font-black text-gray-500 uppercase tracking-[0.2em] mb-1.5 group-hover:text-amber-500 transition-colors">Socio B (50%)</p>
-                            <p className="text-2xl font-black text-white tracking-tight">${Number(trip.partner_b_share_usd || 0).toLocaleString('es-ES')}</p>
+                            <p className="text-2xl font-black text-white tracking-tight">${formatCompactNumber(Number(trip.partner_b_share_usd || 0))}</p>
                         </div>
                     </div>
 
@@ -456,11 +457,11 @@ export default function TripDetailPage({ params }: PageProps) {
                             disabled={isUpdatingStatus}
                             onClick={() => handleStatusChange(s)}
                             className={`flex-1 py-4 rounded-[1.4rem] text-[11px] font-black tracking-widest uppercase transition-all relative z-10 ${trip.status === s
-                                    ? s === 'Completado' ? 'bg-green-500 shadow-xl text-white scale-[1.03]'
-                                        : s === 'Cancelado' ? 'bg-red-500 shadow-xl text-white scale-[1.03]'
-                                            : s === 'En curso' ? 'bg-blue-500 shadow-xl text-white scale-[1.03]'
-                                                : 'bg-[#0f172a] shadow-xl text-white scale-[1.03]'
-                                    : 'text-slate-400 hover:bg-slate-200/40'
+                                ? s === 'Completado' ? 'bg-green-500 shadow-xl text-white scale-[1.03]'
+                                    : s === 'Cancelado' ? 'bg-red-500 shadow-xl text-white scale-[1.03]'
+                                        : s === 'En curso' ? 'bg-blue-500 shadow-xl text-white scale-[1.03]'
+                                            : 'bg-[#0f172a] shadow-xl text-white scale-[1.03]'
+                                : 'text-slate-400 hover:bg-slate-200/40'
                                 }`}
                         >
                             {isUpdatingStatus && pendingStatus === s ? (

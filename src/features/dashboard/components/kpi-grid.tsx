@@ -1,4 +1,5 @@
 import { TrendingUp, TrendingDown, Wallet, ArrowUpCircle, ArrowDownCircle } from 'lucide-react'
+import { formatCompactNumber } from '@/shared/lib/format-utils'
 
 interface KPICardProps {
     title: string
@@ -40,7 +41,7 @@ function KPICard({ title, value, subtitle, trend, trendUp, variant = 'white' }: 
 
             <div className="flex items-baseline gap-2">
                 <span className={`text-[2.75rem] leading-none font-black tracking-tighter ${isDark ? 'text-white' : 'text-gray-900'}`}>
-                    ${Number(value || 0).toLocaleString('es-ES', { minimumFractionDigits: 0 })}
+                    ${formatCompactNumber(value || 0)}
                 </span>
                 {isDark && (
                     <span className="text-sm font-black text-[#f59e0b] mb-1">USD</span>
